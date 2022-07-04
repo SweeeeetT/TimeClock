@@ -1,0 +1,8 @@
+[package]
+name = "gui"
+version = "0.1.0"
+authors = ["SweeeeetT"]
+edition = "2021"
+
+[dependencies]
+structopt = { version = "0.3"}
