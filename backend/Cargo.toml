@@ -5,4 +5,3 @@ authors = ["SweeeeetT"]
 edition = "2021"
 
 [dependencies]
-structopt = { version = "0.3"}

@@ -5,4 +5,5 @@ authors = ["SweeeeetT"]
 edition = "2021"
 
 [dependencies]
-structopt = { version = "0.3"}
+native-windows-gui = { version = "1.0.12"}
+native-windows-derive = { version = "1.0.3" }
