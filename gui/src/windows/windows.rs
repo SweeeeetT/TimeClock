@@ -19,20 +19,20 @@ pub struct TCWindow {
     hello_button: nwg::Button
 }
 
-impl TCWindow {
+// impl TCWindow {
 
-    fn say_hello(&self) {
-        nwg::simple_message("Hello", &format!("Hello {}", self.name_edit.text()));
-    }
+//     fn say_hello(&self) {
+//         nwg::simple_message("Hello", &format!("Hello {}", self.name_edit.text()));
+//     }
 
-    fn say_goodbye(&self) {
-        nwg::simple_message("Goodbye", &format!("Goodbye {}", self.name_edit.text()));
-        nwg::stop_thread_dispatch();
-    }
+//     fn say_goodbye(&self) {
+//         nwg::simple_message("Goodbye", &format!("Goodbye {}", self.name_edit.text()));
+//         nwg::stop_thread_dispatch();
+//     }
 
-}
+// }
 
-fn main() {
+pub fn gui_main() {
     nwg::init().expect("Failed to init Native Windows GUI");
 
     let _app = TCWindow::build_ui(Default::default()).expect("Failed to build UI");

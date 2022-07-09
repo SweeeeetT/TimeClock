@@ -1,0 +1,9 @@
+[package]
+name = "timeclock"
+version = "0.1.0"
+authors = ["SweeeeetT"]
+edition = "2021"
+
+[dependencies]
+backend = { path = "../backend" }
+gui = { path = "../gui" }
