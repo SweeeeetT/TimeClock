@@ -7,3 +7,4 @@ edition = "2021"
 [dependencies]
 native-windows-gui = { version = "1.0.12"}
 native-windows-derive = { version = "1.0.3" }
+backend = { path = "../backend" }

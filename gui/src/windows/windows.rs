@@ -3,6 +3,7 @@ extern crate native_windows_derive as nwd;
 
 use nwd::NwgUi;
 use nwg::NativeUi;
+use backend::timekeeper::timekeeper;
 
 
 #[derive(Default, NwgUi)]
@@ -11,15 +12,17 @@ pub struct TCWindow {
     #[nwg_events( OnWindowClose: [TCWindow::say_goodbye] )]
     window: nwg::Window,
 
-    #[nwg_control(text: "Salary", size: (280, 25), position: (10, 10))]
+    #[nwg_control(text: "Rate", size: (280, 25), position: (10, 10))]
     name_edit: nwg::TextInput,
+
+
 
     #[nwg_control(text: "Start Clock", size: (280, 25), position: (10, 40))]
     #[nwg_events( OnButtonClick: [TCWindow::toggle_clock] )]
     hello_button: nwg::Button,
 
-    // #[nwg_control(size: (280, 20), position: (10, 100))]
-    // clock: nwg::GridLayout
+    #[nwg_control(text: "", size: (280, 20), position: (10, 100), readonly: true)]
+    clock: nwg::TextInput
 }
 
 impl TCWindow {
