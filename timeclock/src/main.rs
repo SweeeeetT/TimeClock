@@ -1,16 +1,17 @@
 use std::thread;
 use gui::windows::windows;
-use backend::{timekeeper::timekeeper, comms::comms};
+use backend::timekeeper::{timekeeper, comms};
 
 
 fn main() {
 
     let channels = comms::DualChannel::new();
-    
-    let timekeeper_thread = thread::spawn(|| {
-        let timekeeper = timekeeper::new(channels.timekeeper_channels);
+    let timekeeper = timekeeper::TimeKeeper::new(channels.timekeeper_channels);
+
+    let timekeeper_thread = thread::spawn(move|| {
+        timekeeper.run();
     });
-    let gui_windows_thread = thread::spawn(|| {
+    let gui_windows_thread = thread::spawn(move|| {
         windows::gui_run(channels.gui_channels);
     });
 

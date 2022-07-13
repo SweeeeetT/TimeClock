@@ -1,8 +1,22 @@
 use std::{sync::mpsc::{channel, Sender, Receiver}, fmt};
 
+pub struct Message {
+    pub op: Operations,
+    pub data: i64,
+}
+
+impl Message {
+    pub fn new(operation: Operations, dat: i64) -> Self {
+        Message {
+            op: operation,
+            data: dat,
+        }
+    }
+}
+
 pub struct DualChannel {
-    pub timekeeper_channels: (Sender<Operations>, Receiver<Operations>),
-    pub gui_channels: (Sender<Operations>, Receiver<Operations>),
+    pub timekeeper_channels: (Sender<Message>, Receiver<Message>),
+    pub gui_channels: (Sender<Message>, Receiver<Message>),
 }
 
 impl DualChannel {
@@ -19,14 +33,57 @@ impl DualChannel {
     }
 }
 
+pub struct SingleChannel {
+    pub sc_out: Sender<Message>,
+    pub sc_in: Receiver<Message>,
+}
+
+impl SingleChannel {
+    pub fn new((timekeeper_out, timekeeper_in): (Sender<Message>, Receiver<Message>)) -> Self {
+        SingleChannel {
+            sc_out: timekeeper_out,
+            sc_in: timekeeper_in,            
+        }
+    }
+
+    pub fn send_alive(&self) {
+        let message = Message::new(Operations::Alive, 0);
+        self.sc_out.send(message).unwrap();
+    }
+}
+
+#[derive(PartialEq, Eq)]
 pub enum Operations {
-    StartTime = 0x01,
-    StopTime,
-    ResetTime,
-    SetRate,
-    Alive,
-    Shutdown,
-    Failure = 0xff,
+    StartTime = 0x1,
+    StopTime = 0x2,
+    ResetTime = 0x3,
+    SetRate = 0x4,
+    Alive = 0x5,
+    Shutdown = 0x6,
+    Failure = 0x7,
+}
+
+#[derive(PartialEq, Eq)]
+pub enum Status {
+    Success = 0x0,
+    Failure = 0xffffffffffffffff,
+}
+impl Status {
+    pub fn from_data_field(data: i64) -> Operations {
+        match data {
+            0x01 => return Status::Success,
+            0xffffffffffffffff => return Status::Failure,
+            _ => return Operations::Failure,
+        }
+    }
+    
+    pub fn to_data_field(status: Status) -> i64 {
+        match data {
+            Status::Success => return 0x01,
+            Status::Failure => return 0xffffffffffffffff,
+            _ => return 0xffffffffffffffff,
+        }
+    }
 }
 
 impl Operations {
