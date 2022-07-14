@@ -8,25 +8,23 @@ use std::sync::mpsc::{Sender, Receiver};
 use debug_print::debug_print;
 
 #[derive(Default, NwgUi)]
-pub struct Window {
+pub struct AppUI {
     #[nwg_control(size: (400, 200), position: (300, 300), title: "Time Clock", flags: "WINDOW|VISIBLE")]
-    #[nwg_events( OnWindowClose: [Window::kill_thread] )]
+    #[nwg_events( OnWindowClose: [AppUI::kill_thread] )]
     window: nwg::Window,
 
     #[nwg_control(text: "Rate", size: (280, 25), position: (10, 10))]
     name_edit: nwg::TextInput,
 
     #[nwg_control(text: "Start Clock", size: (280, 25), position: (10, 40))]
-    #[nwg_events( OnButtonClick: [Window::toggle_clock] )]
+    #[nwg_events( OnButtonClick: [AppUI::toggle_clock] )]
     hello_button: nwg::Button,
 
     #[nwg_control(text: "", size: (280, 20), position: (10, 100), readonly: true)]
     clock: nwg::TextInput,
-
-    pub comms: comms::SingleChannel,
 }
 
-impl Window {
+impl AppUI {
     fn toggle_clock(&self) {
         // nwg::simple_message("Hello", &format!("Hello {}", self.name_edit.text()));
         if self.hello_button.text() == "Start Clock" {
@@ -35,17 +33,22 @@ impl Window {
             self.hello_button.set_text("Start Clock");
         }
     }
+    fn notify_alive(&self) {
+        nwg::simple_message("Alive!", "IT'S ALIVE!!");
+    }
+
+    fn kill_thread(&self) {
+        nwg::stop_thread_dispatch();
+    }
 }
 
 pub struct GUI {
-    window: Window,
-    comms: Channel,
+    comms: comms::SingleChannel,
 }
 
 impl GUI {
     pub fn new((gui_out, gui_in): (Sender<comms::Message>, Receiver<comms::Message>)) -> Self {
         GUI {
-            window: Window::build_ui(Default::default()).expect("Failed to build UI"),
             comms: comms::SingleChannel::new((gui_out, gui_in)),
         }
     }
@@ -57,11 +60,12 @@ impl GUI {
         return request.op == comms::Operations::Alive
     }
 
-    pub fn gui_run(&self) {
+    pub fn run(&self) {
         nwg::init().expect("Failed to init Native Windows GUI");
+        let ui = AppUI::build_ui(Default::default()).expect("Failed to build UI");
         let mut gui_running = true;
         if self.timekeeper_is_alive() {
-            app.notify_alive();
+            ui.notify_alive();
         }
         // while gui_running && backend_alive{
         //     let request = comms.sc_in.recv().unwrap();
@@ -81,13 +85,7 @@ impl GUI {
         nwg::dispatch_thread_events();
     }
 
-    fn notify_alive(&self) {
-        nwg::simple_message("Alive!", "IT'S ALIVE!!");
-    }
 
-    fn kill_thread(&self) {
-        nwg::stop_thread_dispatch();
-    }
 }
 
 

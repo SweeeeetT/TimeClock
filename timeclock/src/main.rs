@@ -7,12 +7,13 @@ fn main() {
 
     let channels = comms::DualChannel::new();
     let timekeeper = timekeeper::TimeKeeper::new(channels.timekeeper_channels);
+    let gui = windows::GUI::new(channels.gui_channels);
 
     let timekeeper_thread = thread::spawn(move|| {
         timekeeper.run();
     });
     let gui_windows_thread = thread::spawn(move|| {
-        windows::gui_run(channels.gui_channels);
+        gui.run();
     });
 
     gui_windows_thread.join().unwrap();
