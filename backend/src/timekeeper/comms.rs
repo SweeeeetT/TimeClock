@@ -1,5 +1,6 @@
 use std::{sync::mpsc::{channel, Sender, Receiver}, fmt};
 
+#[derive(Debug)]
 pub struct Message {
     pub op: Operations,
     pub data: i64,
@@ -53,6 +54,33 @@ impl SingleChannel {
 }
 
 #[derive(PartialEq, Eq)]
+pub enum Status {
+    Success = 0x0,
+    Failure = 0x7FFFFFFFFFFFFFFF,
+}
+
+impl Status {
+    pub fn from_data_field(data: i64) -> Self {
+        match data {
+            0x01 => return Status::Success,
+            0x7FFFFFFFFFFFFFFF => return Status::Failure,
+            _ => return Status::Failure,
+        }
+    }
+    
+    pub fn to_data_field(status: Status) -> i64 {
+        match status {
+            Status::Success => return 0x01,
+            Status::Failure => return 0x7FFFFFFFFFFFFFFF,
+        }
+    }
+
+    pub fn is_success(&self) -> bool {
+        return *self == Status::Success
+    }
+}
+
+#[derive(PartialEq, Eq)]
 pub enum Operations {
     StartTime = 0x1,
     StopTime = 0x2,
@@ -60,34 +88,13 @@ pub enum Operations {
     SetRate = 0x4,
     Alive = 0x5,
     Shutdown = 0x6,
-    Failure = 0x7,
+    TimeUpdate = 0x7,
+    Failure = 0xff,
 }
 
-#[derive(PartialEq, Eq)]
-pub enum Status {
-    Success = 0x0,
-    Failure = 0xffffffffffffffff,
-}
-impl Status {
-    pub fn from_data_field(data: i64) -> Operations {
-        match data {
-            0x01 => return Status::Success,
-            0xffffffffffffffff => return Status::Failure,
-            _ => return Operations::Failure,
-        }
-    }
-    
-    pub fn to_data_field(status: Status) -> i64 {
-        match data {
-            Status::Success => return 0x01,
-            Status::Failure => return 0xffffffffffffffff,
-            _ => return 0xffffffffffffffff,
-        }
-    }
-}
 
 impl Operations {
-    pub fn from_u8(val: u8) -> Operations {
+    pub fn from_u8(val: u8) -> Self {
         match val {
             0x01 => return Operations::StartTime,
             0x02 => return Operations::StopTime,
@@ -95,6 +102,7 @@ impl Operations {
             0x04 => return Operations::SetRate,
             0x05 => return Operations::Alive,
             0x06 => return Operations::Shutdown,
+            0x07 => return Operations::TimeUpdate,
             _ => return Operations::Failure,
         }
     }
@@ -109,6 +117,7 @@ impl fmt::Debug for Operations {
             Operations::SetRate => write!(f, "SetRate"),
             Operations::Alive => write!(f, "Alive"),
             Operations::Shutdown => write!(f, "Shutdown"),
+            Operations::TimeUpdate => write!(f, "TimeUpdate"),
             Operations::Failure => write!(f, "Failure"),
         }
     }

@@ -8,3 +8,4 @@ edition = "2021"
 native-windows-gui = { version = "1.0.12"}
 native-windows-derive = { version = "1.0.3" }
 backend = { path = "../backend" }
+debug_print = "1.0"
